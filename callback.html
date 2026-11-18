@@ -11,6 +11,8 @@
   h1 { font-size: 24px; margin: 0 0 8px; color: #fff; }
   p { color: #94a3b8; line-height: 1.6; margin: 8px 0; }
   code { display: block; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin: 16px 0; word-break: break-all; font-size: 13px; color: #7dd3fc; text-align: left; }
+  .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; text-align: left; margin: 12px 0 -8px; }
+  button { background: #25f4ee; color: #0f172a; border: 0; border-radius: 8px; padding: 10px 18px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; }
   .note { font-size: 13px; color: #64748b; }
   a { color: #7dd3fc; }
 </style>
@@ -19,22 +21,37 @@
 <div class="card">
   <div class="check">&#10003;</div>
   <h1 id="title">Login Successful</h1>
-  <p id="message">Your TikTok account has been connected to Creator Post Studio. You can close this window and return to the app.</p>
-  <code id="code" style="display:none"></code>
+  <p id="message">Your TikTok account has been connected to Creator Post Studio. Copy the authorization code below and paste it into the Creator Post Studio demo app to finish connecting.</p>
+  <div id="codeBlock" style="display:none">
+    <p class="label">Authorization code</p>
+    <code id="code"></code>
+    <button id="copyBtn" type="button">Copy code</button>
+    <p class="label">State (check it matches the demo app)</p>
+    <code id="state"></code>
+  </div>
   <p class="note">Creator Post Studio only posts videos to the account you connected. It never posts to other accounts and never accesses your followers' data.</p>
   <p class="note"><a href="./">Back to Creator Post Studio</a></p>
 </div>
 <script>
   var params = new URLSearchParams(window.location.search);
   var code = params.get('code');
+  var state = params.get('state');
   var err = params.get('error');
   if (err) {
     document.getElementById('title').textContent = 'Login was not completed';
     document.getElementById('message').textContent = 'TikTok returned an error: ' + err + '. Please close this window and try again from Creator Post Studio.';
     document.querySelector('.check').textContent = '\u2715';
   } else if (code) {
-    document.getElementById('code').style.display = 'block';
-    document.getElementById('code').textContent = 'Authorization code received. Code: ' + code;
+    document.getElementById('codeBlock').style.display = 'block';
+    document.getElementById('code').textContent = code;
+    document.getElementById('state').textContent = state || '(none)';
+    document.getElementById('copyBtn').addEventListener('click', function () {
+      var btn = document.getElementById('copyBtn');
+      navigator.clipboard.writeText(code).then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy code'; }, 1500);
+      });
+    });
   }
 </script>
 </body>
